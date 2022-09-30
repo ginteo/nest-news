@@ -1,3 +1,4 @@
+import { TransformInterceptor } from '@libs/common/interceptors/transform.interceptor'
 import {
   Logger,
   UnprocessableEntityException,
@@ -5,7 +6,7 @@ import {
   ValidationPipe
 } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import { NestFactory } from '@nestjs/core'
+import { NestFactory, Reflector } from '@nestjs/core'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import { AppModule } from './app.module'
 
@@ -49,6 +50,9 @@ async function bootstrap() {
       }
     })
   )
+
+  // 全局拦截器，返回统一数据格式
+  app.useGlobalInterceptors(new TransformInterceptor(new Reflector()))
 
   await app.listen(APP_PORT, () =>
     logger.log(
