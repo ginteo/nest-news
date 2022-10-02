@@ -1,3 +1,4 @@
+import { HttpExceptionFilter } from '@libs/common/filters/http-exception.filter'
 import { TransformInterceptor } from '@libs/common/interceptors/transform.interceptor'
 import {
   Logger,
@@ -53,6 +54,9 @@ async function bootstrap() {
 
   // 全局拦截器，返回统一数据格式
   app.useGlobalInterceptors(new TransformInterceptor(new Reflector()))
+
+  // 全局异常过滤器
+  app.useGlobalFilters(new HttpExceptionFilter())
 
   await app.listen(APP_PORT, () =>
     logger.log(
