@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { hashSync } from 'bcryptjs'
 import { Like, Repository } from 'typeorm'
 import { CreateAdminDto } from './dto/create-admin.dto'
 import { PaginationAdminDto } from './dto/pagination-admin.dto'
@@ -14,16 +13,7 @@ export class AdminService {
   ) {}
 
   create(createAdminDto: CreateAdminDto) {
-    const { account, password } = createAdminDto
-    // 密码加密
-    const bcryptPassword = hashSync(password)
-
-    return this.adminRepository
-      .createQueryBuilder()
-      .insert()
-      .into(Admin)
-      .values({ account, password: bcryptPassword })
-      .execute()
+    return this.adminRepository.save(createAdminDto)
   }
 
   async findAll(paginationQueryDto: PaginationAdminDto) {
@@ -47,6 +37,7 @@ export class AdminService {
   findOne(id: number) {
     return this.adminRepository
       .createQueryBuilder('admin')
+      .addSelect('admin.refreshToken')
       .where('admin.id = :id', { id })
       .getOne()
   }
@@ -54,25 +45,20 @@ export class AdminService {
   findOneByAccout(account: string) {
     return this.adminRepository
       .createQueryBuilder('admin')
+      .addSelect('admin.password')
       .where('admin.account = :account', { account })
       .getOne()
   }
 
   update(id: number, updateAdminDto: UpdateAdminDto) {
-    return this.adminRepository
-      .createQueryBuilder()
-      .update(Admin)
-      .set({ ...updateAdminDto })
-      .where('id = :id', { id })
-      .execute()
+    return this.adminRepository.update(id, updateAdminDto)
+  }
+
+  updateRefreshToken(id: number, refreshToken: string) {
+    return this.adminRepository.update(id, { refreshToken })
   }
 
   remove(id: number) {
-    return this.adminRepository
-      .createQueryBuilder()
-      .delete()
-      .from(Admin)
-      .where('id = :id', { id })
-      .execute()
+    return this.adminRepository.delete(id)
   }
 }

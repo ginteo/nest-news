@@ -1,3 +1,4 @@
+import { JwtAuthGuard } from '@libs/common/guards'
 import {
   Controller,
   Get,
@@ -7,16 +8,20 @@ import {
   Param,
   Delete,
   BadRequestException,
-  Query
+  Query,
+  UseGuards
 } from '@nestjs/common'
-import { ApiOperation, ApiTags } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger'
+import { hashSync } from 'bcryptjs'
 import { AdminService } from './admin.service'
 import { CreateAdminDto } from './dto/create-admin.dto'
 import { PaginationAdminDto } from './dto/pagination-admin.dto'
 import { UpdateAdminDto } from './dto/update-admin.dto'
 
 @Controller('admin')
+@UseGuards(JwtAuthGuard)
 @ApiTags('管理员')
+@ApiBearerAuth()
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
@@ -31,9 +36,13 @@ export class AdminController {
       throw new BadRequestException('账号已注册')
     }
 
-    await this.adminService.create(createAdminDto)
+    // 密码加密
+    const hashPassword = hashSync(createAdminDto.password)
 
-    return null
+    return this.adminService.create({
+      ...createAdminDto,
+      password: hashPassword
+    })
   }
 
   @Get()

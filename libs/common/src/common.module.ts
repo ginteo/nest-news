@@ -1,7 +1,9 @@
-import { Module } from '@nestjs/common'
+import { Global, Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
+import { JwtModule } from '@nestjs/jwt'
 import { TypeOrmModule } from '@nestjs/typeorm'
 
+@Global()
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -21,7 +23,9 @@ import { TypeOrmModule } from '@nestjs/typeorm'
           synchronize: process.env.NODE_ENV === 'development' ? true : false
         }
       }
-    })
-  ]
+    }),
+    JwtModule.register({})
+  ],
+  exports: [JwtModule]
 })
 export class CommonModule {}
