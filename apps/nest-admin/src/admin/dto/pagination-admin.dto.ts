@@ -5,6 +5,10 @@ import { IsOptional, IsString, IsEnum } from 'class-validator'
 import { $enum } from 'ts-enum-util'
 
 export class PaginationAdminDto extends PaginationQueryDto {
+  @ApiPropertyOptional({ type: String, description: '账号模糊搜索' })
+  @IsOptional()
+  account?: string
+
   @ApiPropertyOptional({ type: String, description: '昵称模糊搜索' })
   @IsOptional()
   nickname?: string

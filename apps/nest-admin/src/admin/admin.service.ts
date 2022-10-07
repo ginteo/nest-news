@@ -17,8 +17,10 @@ export class AdminService {
   }
 
   async findAll(paginationQueryDto: PaginationAdminDto) {
-    const { nickname, tel, status, type, offset, limit } = paginationQueryDto
+    const { account, nickname, tel, status, type, offset, limit } =
+      paginationQueryDto
     const where = {
+      account: account ? Like(`%${account}%`) : null,
       nickname: nickname ? Like(`%${nickname}%`) : null,
       tel: tel ? Like(`%${tel}%`) : null,
       status: status ?? null,
