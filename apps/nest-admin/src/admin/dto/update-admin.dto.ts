@@ -26,4 +26,12 @@ export class UpdateAdminDto {
   @IsEnum(AccountStatus)
   @IsOptional()
   status?: number
+
+  @ApiPropertyOptional({
+    type: Number,
+    description: '分配角色，角色id',
+    default: 4
+  })
+  @IsOptional()
+  roleId?: number
 }

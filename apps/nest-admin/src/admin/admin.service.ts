@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Like, Repository } from 'typeorm'
+import { RoleService } from '../role/role.service'
 import { CreateAdminDto } from './dto/create-admin.dto'
 import { PaginationAdminDto } from './dto/pagination-admin.dto'
 import { UpdateAdminDto } from './dto/update-admin.dto'
@@ -9,7 +10,9 @@ import { Admin } from './entities/admin.entity'
 @Injectable()
 export class AdminService {
   constructor(
-    @InjectRepository(Admin) private readonly adminRepository: Repository<Admin>
+    @InjectRepository(Admin)
+    private readonly adminRepository: Repository<Admin>,
+    private readonly roleService: RoleService
   ) {}
 
   create(createAdminDto: CreateAdminDto) {
@@ -30,7 +33,8 @@ export class AdminService {
     const [list, count] = await this.adminRepository.findAndCount({
       where,
       skip: (offset - 1) * limit,
-      take: limit
+      take: limit,
+      relations: ['role']
     })
 
     return { list, count, page_index: offset, page_size: limit }
@@ -40,6 +44,7 @@ export class AdminService {
     return this.adminRepository
       .createQueryBuilder('admin')
       .addSelect('admin.refreshToken')
+      .leftJoinAndSelect('admin.role', 'role')
       .where('admin.id = :id', { id })
       .getOne()
   }
@@ -52,8 +57,12 @@ export class AdminService {
       .getOne()
   }
 
-  update(id: number, updateAdminDto: UpdateAdminDto) {
-    return this.adminRepository.update(id, updateAdminDto)
+  async update(id: number, updateAdminDto: UpdateAdminDto) {
+    const { roleId, ...result } = updateAdminDto
+    // 通过roleId找到角色
+    const role = await this.roleService.findOne(roleId)
+
+    return this.adminRepository.update(id, { ...result, role })
   }
 
   updateRefreshToken(id: number, refreshToken: string) {

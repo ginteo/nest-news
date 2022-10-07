@@ -1,8 +1,9 @@
 import { Common } from '@libs/common/entities/common.entity'
 import { AccountStatus, AccountType } from '@libs/common/type'
 import { ApiHideProperty } from '@nestjs/swagger'
-import { Column, Entity } from 'typeorm'
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm'
 import { Exclude } from 'class-transformer'
+import { Role } from '../../role/entities/role.entity'
 
 @Entity('admin')
 export class Admin extends Common {
@@ -38,4 +39,8 @@ export class Admin extends Common {
   @ApiHideProperty()
   @Column({ nullable: true, select: false })
   refreshToken: string
+
+  @ManyToOne(() => Role, role => role.id)
+  @JoinColumn()
+  role: Role
 }
