@@ -7,7 +7,7 @@ import {
 import { Reflector } from '@nestjs/core'
 import { Response } from 'express'
 import { map, Observable } from 'rxjs'
-import { KEEP_KEY } from '../decorators/keep.decorator'
+import { KEEP_KEY } from '../decorators'
 
 @Injectable()
 export class TransformInterceptor implements NestInterceptor {
