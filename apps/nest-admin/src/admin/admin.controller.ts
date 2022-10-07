@@ -7,14 +7,18 @@ import {
   Param,
   Delete,
   BadRequestException,
-  Query
+  Query,
+  UseInterceptors,
+  ClassSerializerInterceptor
 } from '@nestjs/common'
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { hashSync } from 'bcryptjs'
+import { plainToInstance } from 'class-transformer'
 import { AdminService } from './admin.service'
 import { CreateAdminDto } from './dto/create-admin.dto'
 import { PaginationAdminDto } from './dto/pagination-admin.dto'
 import { UpdateAdminDto } from './dto/update-admin.dto'
+import { Admin } from './entities/admin.entity'
 
 @Controller('admin')
 @ApiTags('管理员')
@@ -23,6 +27,7 @@ export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
   @Post()
+  @UseInterceptors(ClassSerializerInterceptor)
   @ApiOperation({ summary: '添加管理员' })
   async create(@Body() createAdminDto: CreateAdminDto) {
     // 管理员账号是否已注册
@@ -36,10 +41,13 @@ export class AdminController {
     // 密码加密
     const hashPassword = hashSync(createAdminDto.password)
 
-    return this.adminService.create({
-      ...createAdminDto,
-      password: hashPassword
-    })
+    return plainToInstance(
+      Admin,
+      await this.adminService.create({
+        ...createAdminDto,
+        password: hashPassword
+      })
+    )
   }
 
   @Get()

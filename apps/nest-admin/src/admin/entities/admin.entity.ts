@@ -1,12 +1,16 @@
 import { Common } from '@libs/common/entities/common.entity'
 import { AccountStatus, AccountType } from '@libs/common/type'
+import { ApiHideProperty } from '@nestjs/swagger'
 import { Column, Entity } from 'typeorm'
+import { Exclude } from 'class-transformer'
 
-@Entity()
+@Entity('admin')
 export class Admin extends Common {
   @Column({ unique: true })
   account: string
 
+  @Exclude({ toPlainOnly: true })
+  @ApiHideProperty()
   @Column({ select: false })
   password: string
 
@@ -30,6 +34,8 @@ export class Admin extends Common {
   })
   type: number
 
+  @Exclude({ toPlainOnly: true })
+  @ApiHideProperty()
   @Column({ nullable: true, select: false })
   refreshToken: string
 }
