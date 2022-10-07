@@ -1,9 +1,5 @@
-import { CurrentUser } from '@libs/common/decorators'
-import {
-  JwtAuthGuard,
-  LocalAuthGuard,
-  RefreshJwtAuthGuard
-} from '@libs/common/guards'
+import { CurrentUser, NoAuth } from '@libs/common/decorators'
+import { LocalAuthGuard, RefreshJwtAuthGuard } from '@libs/common/guards'
 import {
   Controller,
   HttpCode,
@@ -27,6 +23,7 @@ export class AuthController {
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
+  @NoAuth()
   @UseGuards(LocalAuthGuard)
   @ApiBody({ type: LoginDto })
   @ApiOperation({ summary: '登录' })
@@ -41,7 +38,6 @@ export class AuthController {
 
   @Post('logout')
   @HttpCode(HttpStatus.OK)
-  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '退出' })
   @ApiBearerAuth()
   async logout(@CurrentUser('id') id: number) {
@@ -50,6 +46,7 @@ export class AuthController {
 
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
+  @NoAuth()
   @UseGuards(RefreshJwtAuthGuard)
   @ApiOperation({ summary: '刷新token' })
   @ApiBearerAuth()

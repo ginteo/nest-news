@@ -1,4 +1,3 @@
-import { JwtAuthGuard } from '@libs/common/guards'
 import {
   Controller,
   Get,
@@ -8,8 +7,7 @@ import {
   Param,
   Delete,
   BadRequestException,
-  Query,
-  UseGuards
+  Query
 } from '@nestjs/common'
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { hashSync } from 'bcryptjs'
@@ -19,7 +17,6 @@ import { PaginationAdminDto } from './dto/pagination-admin.dto'
 import { UpdateAdminDto } from './dto/update-admin.dto'
 
 @Controller('admin')
-@UseGuards(JwtAuthGuard)
 @ApiTags('管理员')
 @ApiBearerAuth()
 export class AdminController {
@@ -63,16 +60,12 @@ export class AdminController {
     @Param('id') id: number,
     @Body() updateAdminDto: UpdateAdminDto
   ) {
-    await this.adminService.update(id, updateAdminDto)
-
-    return null
+    return this.adminService.update(id, updateAdminDto)
   }
 
   @Delete(':id')
   @ApiOperation({ summary: '删除管理员' })
   async remove(@Param('id') id: number) {
-    await this.adminService.remove(id)
-
-    return null
+    return this.adminService.remove(id)
   }
 }
